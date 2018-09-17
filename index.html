@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="./assets/css/style.css">
+
+    <title>Basic Trivia</title>
+  </head>
+  <body>
+
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container text-center header-font border">
+        <img src="assets/images/header-logo.jpg" alt="final fantasy logo" id="header-photo"> Trivia (basic)
+        <hr class="my-4">
+        <p>Answer the Final Fantasy series trivia questions below before time is up or you press the "done" button. I will then reveal the answers and give you your score</p>
+      </div>
+    </div>
+
+    <main class="container pb-2 pt-2 border mt-3">
+        <div class="row">
+          <span class="col-12 game-display text-center">Press start to begin</span>
+        </div>
+        <div class="row">
+          <div class="col-12 text-center start-area">
+            <form id="start" class="pl-3 pr-3" name="start">
+                <button id="start">Start</button>
+            </form>
+          </div>
+        </div>
+        <!-- will dynamically add questions here-->
+        <form id="questions" class="pl-3 pr-3" name="questions" ></form>
+    </main>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="./assets/javascript/game.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
