@@ -1,54 +1,50 @@
 $( document ).ready(function() {
 
     var seconds;   //give user 5 mins
-    var timed;
+    //var timed;
     var trivia;
     var correct;
     var incorrect;
     var undef;
+    var num_questions;
+    var clock;
 
-    $("#questions").hide();
+    $("#question").hide();
+    $(".answers").hide();
     //this function will render the question to the page
     function renderQuestion(number)
     {
-        $("#questions").append('<div class="row col-12 pb-2 question-formatting border mb-2 mt-2"> ' +trivia[number].question + '</div>');   //add row with question content
-        $("#questions").append('<div class="row question'+(number+1)+'"> </div>'); //create row for answers to be placed into
+        //var button = this;
+        $(".answers").show();
+        $("#question").show();
 
+        //display question to screen
+        $("#question").text(trivia[number].question);   
         //answer1
-        $("#questions").find('.question'+(number+1)).append('<div class="col-3 div-question'+(number+1)+'-answer1">');    //generate div of size col-3
-        $("#questions").find('.div-question'+(number+1)+'-answer1').append('<label for="q'+number+'">'+trivia[number].answer1+'</label>');    //create label for radial input
-        $("#questions").find('.div-question'+(number+1)+'-answer1').append('<input type="submit" name="q'+i+'" value="1" />'); //create radial inoput attached to col-3 div
-
+        $("#answer1").text(trivia[number].answer1); 
         //answer2
-        $("#questions").find('.question'+(number+1)).append('<div class="col-3 div-question'+(number+1)+'-answer2">');    
-        $("#questions").find('.div-question'+(number+1)+'-answer2').append('<label for="q'+number+'">'+trivia[number].answer2+'</label>');
-        $("#questions").find('.div-question'+(number+1)+'-answer2').append('<input type="submit" name="q'+number+'" value="2" />');
-
+        $("#answer2").text(trivia[number].answer2);    
         //answer3
-        $("#questions").find('.question'+(number+1)).append('<div class="col-3 div-question'+(number+1)+'-answer3">');
-        $("#questions").find('.div-question'+(number+1)+'-answer3').append('<label for="q'+number+'">'+trivia[number].answer3+'</label>');
-        $("#questions").find('.div-question'+(number+1)+'-answer3').append('<input type="submit" name="q'+number+'" value="3" />');
-
+        $("#answer3").text(trivia[number].answer3);
         //answer4
-        $("#questions").find('.question'+(number+1)).append('<div class="col-3 div-question'+(number+1)+'-answer4">');
-        $("#questions").find('.div-question'+(number+1)+'-answer4').append('<label for="q'+number+'">'+trivia[number].answer4+'</label>');
-        $("#questions").find('.div-question'+(number+1)+'-answer4').append('<input type="submit" name="q'+number+'" value="4" />');
+        $("#answer4").text(trivia[number].answer4);
 
     }
 
-    function computeQuestion() {
-        //clearInterval(timer);
-        for(var i=0;i<trivia.length;i++)
-        {
-            var temp1 = $('input[name=q'+(i)+']:checked').val();
-            console.log(temp1);
-            if(trivia[i].rightanswer == temp1) //does user entry for this question match answer?
-                correct++;
-            else if(!parseInt(temp1)) //DID USER NOT ANSWER (we expect an integer if val was captured)
-                undef++;
-            else
-                incorrect++;
-        }
+    function timer() {
+        clock = setInterval(function() {
+            $(".game-display").text("Time remaining: "+seconds + " seconds");
+            seconds--; 
+            console.log(seconds);
+            if(seconds <0)
+            {
+                clearInterval(clock); 
+            }
+        },1000);
+        return timer;
+    }
+    function endGame() {
+        //display statistics to the screen and refresh the game
         console.log(correct);
         console.log(incorrect);
         console.log(undef);
@@ -59,22 +55,24 @@ $( document ).ready(function() {
         $(".start-area").append('<form id="start" class="pl-3 pr-3" name="start"><button id="start">Replay?</button></form>');
     }
 
-    function timer() {
-        seconds--;
-        $(".game-display").text("Time remaining: "+seconds + " seconds");
-        if(seconds == 0)    //out of time?
-        {
-            clearInterval(timed);   //disable timer
-            computeQuestion(); //parse answer for question
-        } 
-    }  
+    function computeQuestion(i,answer) {
+        console.log(trivia[i].rightanswer);
+        if(trivia[i].rightanswer == answer) //does user entry for this question match answer?
+            correct++;
+        else if(!parseInt(answer)) //DID USER NOT ANSWER (we expect an integer if val was captured)
+            undef++;
+        else
+            incorrect++;
+        num_questions--;
+        seconds = 30;
+    }
 
     function triviaGame() {
 
         //initialize
         correct = incorrect = undef = 0;
-        seconds = 300;
-        $("#start").remove("button");    //remove start button form
+        seconds = 30;
+        //$("#start").remove("button");    //remove start button form
         $("#questions").show(); //show the form element again
 
         trivia = [ 
@@ -95,26 +93,29 @@ $( document ).ready(function() {
         {question:"Who is the lead character of Final Fantasy VIII?",answer1:"Squall",answer2:"Rinoa",answer3:"Zidane",answer4:"Kefka",rightanswer:1,imgurl:"squall"},
         ];
 
-        for(var i=0; i< trivia.length; i++) {   //loop through "i" questions
-            renderquestion(i); //spit question out to page for iterator we are on
-            timed = setInterval(timer,1000); //second by second timer
+        console.log("question: " +0);
+        for(num_question =0;num_question<trivia.length;num_question++) {
+            renderQuestion(num_question);
+       // timer();
+       // computeQuestion(num_questions);
         }
+        endGame();  //out of questions, finish up
     } 
 
-    $("#start").submit(function(event){ //when button is pressed
-        event.preventDefault(); //do not refresh page
+    $("#start").click(function(event){ //starts game 
+        event.preventDefault();
         $("#start").empty(); 
-        triviaGame();   //generate trivia game
+        triviaGame();
     });
 
-    $("#questions").submit(function(event){ //when button is pressed
-        event.preventDefault(); //do not refresh page
-        console.log("complete");
-        if(seconds != 0)  //if timer isn't done, then finish
-        {
-            clearInterval(timed);
-            console.log("finishgame");
-            finishGame();
+    $("#answer1, #answer2, #answer3 ,#answer4").click(function(event) {
+        event.preventDefault();
+        console.log("i clicked");
+        if(seconds > 0) //did time not elapse yet?
+        {      
+            clearInterval(clock);   //stop timer
+            var answer = $(this).attr('data-value');    //grab answer from div
+            computeQuestion(num_question,answer);   //calculate whether the answer was right or wrong
         }
     });
 
