@@ -1,7 +1,6 @@
 $( document ).ready(function() {
 
     var seconds;   //give user 5 mins
-    //var timed;
     var trivia;
     var correct;
     var incorrect;
@@ -14,6 +13,7 @@ $( document ).ready(function() {
     //this function will render the question to the page
     function renderQuestion(number)
     {
+        console.log("render");
         //var button = this;
         $(".answers").show();
         $("#question").show();
@@ -28,23 +28,54 @@ $( document ).ready(function() {
         $("#answer3").text(trivia[number].answer3);
         //answer4
         $("#answer4").text(trivia[number].answer4);
+        
+
+    }
+    function renderAnswer() {
+        $("#question").hide();
+        $(".answers").hide();
+        $(".game-display").hide();
+        
+        //display
+        $(".answer-splash").text("The answer is "+ )
+
 
     }
 
-    function timer() {
-        clock = setInterval(function() {
-            $(".game-display").text("Time remaining: "+seconds + " seconds");
-            seconds--; 
-            console.log(seconds);
-            if(seconds <0)
-            {
-                clearInterval(clock); 
-            }
-        },1000);
-        return timer;
+    function gameLoop(q_and_a) {
+        if(q_and_a) {//is this a question timer??
+            seconds = 30;
+            clock = setInterval(function() {
+                seconds--; 
+                console.log("Question seconds: "+seconds);
+                $(".game-display").text("Time left :" + seconds);
+                renderQuestion(num_questions);
+                if(seconds <1)
+                {
+                    clearInterval(clock); 
+                    computeQuestion(num_questions,undefined);
+                }
+            },1000);
+        }
+        else {//answer timer
+            seconds = 3;
+            clock = setInterval(function() {
+                seconds--; 
+                console.log("Answer second: "+seconds);
+                renderAnswer();
+                if(seconds <1)
+                {
+                    clearInterval(clock); 
+                    gameLoop(1);
+                }
+            },1000);
+        } 
     }
+
     function endGame() {
         //display statistics to the screen and refresh the game
+        $("#question").empty();
+        $(".answers").empty();
         console.log(correct);
         console.log(incorrect);
         console.log(undef);
@@ -53,18 +84,25 @@ $( document ).ready(function() {
         $(".container").remove("#questions");
         $("#questions").empty()
         $(".start-area").append('<form id="start" class="pl-3 pr-3" name="start"><button id="start">Replay?</button></form>');
+        $(".header-tron").show();  //show jumbotron for user reset
     }
 
-    function computeQuestion(i,answer) {
-        console.log(trivia[i].rightanswer);
-        if(trivia[i].rightanswer == answer) //does user entry for this question match answer?
+    function computeQuestion(num_question,answer) {
+        
+        if(trivia[num_question].rightanswer == answer) //does user entry for this question match answer?
             correct++;
         else if(!parseInt(answer)) //DID USER NOT ANSWER (we expect an integer if val was captured)
             undef++;
         else
             incorrect++;
         num_questions--;
-        seconds = 30;
+
+        //okay hide everything to show some stuff real quick then restore state
+        
+        if(num_questions == -1)
+            endGame();  //done. let's wrap up
+
+        gameLoop(0);
     }
 
     function triviaGame() {
@@ -72,6 +110,7 @@ $( document ).ready(function() {
         //initialize
         correct = incorrect = undef = 0;
         seconds = 30;
+        $(".header-tron").hide();  //remove jumbotron while game is in session
         //$("#start").remove("button");    //remove start button form
         $("#questions").show(); //show the form element again
 
@@ -93,13 +132,9 @@ $( document ).ready(function() {
         {question:"Who is the lead character of Final Fantasy VIII?",answer1:"Squall",answer2:"Rinoa",answer3:"Zidane",answer4:"Kefka",rightanswer:1,imgurl:"squall"},
         ];
 
+        num_questions = trivia.length-1;
         console.log("question: " +0);
-        for(num_question =0;num_question<trivia.length;num_question++) {
-            renderQuestion(num_question);
-       // timer();
-       // computeQuestion(num_questions);
-        }
-        endGame();  //out of questions, finish up
+        gameLoop(1);
     } 
 
     $("#start").click(function(event){ //starts game 
@@ -115,7 +150,7 @@ $( document ).ready(function() {
         {      
             clearInterval(clock);   //stop timer
             var answer = $(this).attr('data-value');    //grab answer from div
-            computeQuestion(num_question,answer);   //calculate whether the answer was right or wrong
+            computeQuestion(num_questions,answer);   //calculate whether the answer was right or wrong
         }
     });
 
