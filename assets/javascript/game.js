@@ -7,16 +7,20 @@ $( document ).ready(function() {
     var undef;
     var num_questions;
     var clock;
+    var answer
 
     $("#question").hide();
     $(".answers").hide();
     //this function will render the question to the page
     function renderQuestion(number)
     {
-        console.log("render");
+        $(".answer-splash").hide();
+        $(".answer-img").hide();
         //var button = this;
         $(".answers").show();
         $("#question").show();
+        $(".game-display").show();
+        $(".answer-img").attr("src","");    //i dont like this but hotfix for now
 
         //display question to screen
         $("#question").text(trivia[number].question);   
@@ -31,15 +35,29 @@ $( document ).ready(function() {
         
 
     }
-    function renderAnswer() {
+    function renderAnswer(num_questions,answer) {
         $("#question").hide();
         $(".answers").hide();
         $(".game-display").hide();
-        
+         
+ 
+        var dispAnswer = trivia[num_questions+1].rightanswer;
+        if(dispAnswer === 1)
+            dispAnswer = trivia[num_questions+1].answer1;
+        else if (dispAnswer === 2)
+            dispAnswer = trivia[num_questions+1].answer2;
+        else if (dispAnswer === 3)
+            dispAnswer = trivia[num_questions+1].answer3;
+        else
+            dispAnswer = trivia[num_questions+1].answer4;
         //display
-        $(".answer-splash").text("The answer is "+ )
+        $(".answer-splash").text("The answer is "+ dispAnswer+"." );    //report right answer
+        console.log("img :" +trivia[num_questions+1].imgurl+".jpg" )
+        $(".answer-img").attr("src","./assets/images/"+trivia[num_questions+1].imgurl+".jpg");
 
-
+        $(".answer-splash").show();
+        $(".answer-img").show();
+        
     }
 
     function gameLoop(q_and_a) {
@@ -62,12 +80,17 @@ $( document ).ready(function() {
             clock = setInterval(function() {
                 seconds--; 
                 console.log("Answer second: "+seconds);
-                renderAnswer();
+                renderAnswer(num_questions,answer);
                 if(seconds <1)
                 {
-                    clearInterval(clock); 
-                    gameLoop(1);
+                    clearInterval(clock);
+                    if(num_questions <0) 
+                        endGame();  //let's gracefully finish the game
+                    else
+                        gameLoop(1);    //push next question to the stack
+
                 }
+
             },1000);
         } 
     }
@@ -76,10 +99,13 @@ $( document ).ready(function() {
         //display statistics to the screen and refresh the game
         $("#question").empty();
         $(".answers").empty();
+        $(".answer-splash").hide();
+        $(".answer-img").hide();
         console.log(correct);
         console.log(incorrect);
         console.log(undef);
         $(".game-display").empty();
+        $(".game-display").show();
         $(".game-display").text("Correct: "+ correct + " Incorrect: "+ incorrect + " No Answer: "+ undef);
         $(".container").remove("#questions");
         $("#questions").empty()
@@ -99,8 +125,8 @@ $( document ).ready(function() {
 
         //okay hide everything to show some stuff real quick then restore state
         
-        if(num_questions == -1)
-            endGame();  //done. let's wrap up
+        //if(num_questions == -1)
+        //    endGame();  //done. let's wrap up
 
         gameLoop(0);
     }
@@ -124,7 +150,7 @@ $( document ).ready(function() {
         {question:"What is Squall's final limit break in Final Fantasy VIII called?",answer1:"Grand Finale",answer2:"Lionheart",answer3:"Armageddon",answer4:"Chain of memories",rightanswer:2,imgurl:"lionheart"},
         {question:"Which of the following is NOT a type of mage?",answer1:"Black mage",answer2:"Purple mage",answer3:"White mage",answer4:"Red mage",rightanswer:2,imgurl:"vivi"},
         {question:"The Mage Masher in Final Fantasy IX is a type of?",answer1:"two bladed staff",answer2:"twin blades",answer3:"crossbow",answer4:"staff",rightanswer:2,imgurl:"magemasher"},
-        {question:"Which of the following is a composer of Final Fantasy music?",answer1:"Koichi Sugiyama",answer2:"Nobout Uematsu",answer3:"Yasunori Mitsuda",answer4:"Jack Wall",rightanswer:2,imgurl:"nobou"},
+        {question:"Which of the following is a composer of Final Fantasy music?",answer1:"Koichi Sugiyama",answer2:"Nobou Uematsu",answer3:"Yasunori Mitsuda",answer4:"Jack Wall",rightanswer:2,imgurl:"nobou"},
         {question:"Which of the following is NOT a Final Fantasy Summon?",answer1:"Doomtrain",answer2:"Shiva",answer3:"Quistis",answer4:"Ifrit",rightanswer:3,imgurl:"quistis"},
         {question:"What is the flying ship in Final Fantasy VIII?",answer1:"Ragnarok",answer2:"Highwind",answer3:"Gallant",answer4:"Gallily",rightanswer:1,imgurl:"ragnarok"},
         {question:"What is the name of Lightning's sister in Final Fantasy XIII?",answer1:"Serah",answer2:"Shannon",answer3:"Rinoa",answer4:"Garnet",rightanswer:1,imgurl:"serah"},
@@ -149,7 +175,7 @@ $( document ).ready(function() {
         if(seconds > 0) //did time not elapse yet?
         {      
             clearInterval(clock);   //stop timer
-            var answer = $(this).attr('data-value');    //grab answer from div
+            answer = $(this).attr('data-value');    //grab answer from div
             computeQuestion(num_questions,answer);   //calculate whether the answer was right or wrong
         }
     });
